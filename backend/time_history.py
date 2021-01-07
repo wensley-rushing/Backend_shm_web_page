@@ -5,6 +5,7 @@ import openseespy.postprocessing.ops_vis as opsv
 
 import backend.TimeHistory.Functions_Hailcreek as FHK
 
+current_path = Path(str(__file__)).parent
 
 #  integrations points
 N = 6
@@ -39,7 +40,7 @@ def get_sensor_data(accelerations_df, interval, sensor):
     Data_sensor = accelerations_df[['sampledatetime',sensor]]
     data_interval = Data_sensor[(Data_sensor['sampledatetime'] >= interval[0]) & (Data_sensor['sampledatetime'] <= interval[1])]
     sensor_txt = sensor+'.txt'
-    np.savetxt(Path.cwd()/'backend'/'data_generated'/'timehistoryfiles'/'sensors'/sensor_txt,data_interval[sensor], fmt='%s')
+    np.savetxt(current_path/'data_generated'/'timehistoryfiles'/'sensors'/sensor_txt,data_interval[sensor], fmt='%s')
     
     
 def Time_history(accelerations_df,interval_i, sensor):
@@ -72,6 +73,6 @@ def Time_history(accelerations_df,interval_i, sensor):
     result_txt = sensor+np.datetime_as_string(interval_i[0]).replace(':','-')+'.txt'
 
     FHK.Timehistory_crusher(
-        'backend/data_generated/timehistoryfiles/results/'+result_txt,
+        str(current_path/'data_generated'/'timehistoryfiles'/'results'/result_txt),
         500,
-        'backend/data_generated/timehistoryfiles/sensors/'+sensor_txt)
+        str(current_path/'data_generated'/'timehistoryfiles'/'sensors'/sensor_txt))

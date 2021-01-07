@@ -7,8 +7,9 @@ from scipy import stats, signal, sparse
 from sqlalchemy import create_engine,exc
 
 ## Global Settigns and credentials loads
-current_path = Path('.')
-with open(current_path/'backend'/'credentials.yaml') as file:
+current_path = Path(str(__file__)).parent
+
+with open(current_path/'credentials.yaml') as file:
     credentials = yaml.load(file, Loader=yaml.FullLoader)
     
 
@@ -32,7 +33,7 @@ def preprocess(df,columns):
     _df[columns[1:]] = df[columns[1:]].apply(signal.detrend)
     return _df
 
-def connection_and_data_retrieving(Q1,Q2):
+def create_connection():
     engine = None
     
     host = credentials['host']
@@ -48,7 +49,13 @@ def connection_and_data_retrieving(Q1,Q2):
     except exc.SQLAlchemyError as e:
         print(f'Error {e}')
         sys.exit(1)
+        
+    return engine
 
+def connection_and_data_retrieving(Q1,Q2):
+
+    engine = create_connection()
+    
     df = pd.read_sql(
     f'''
     SELECT *

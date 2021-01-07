@@ -9,6 +9,8 @@ import openseespy.postprocessing.ops_vis as opsv
 from scipy import stats
 from pathlib import Path
 
+current_path = Path(str(__file__)).parent
+
 
 """
     1. rot_transf_3d
@@ -641,15 +643,15 @@ def Create_conect_copynode(Ni,Nj,conect,Nodes):
 #---------------------------- 11.Topology ------------------------------------#
 def Topology():
     # Get the Nodes coordinate
-    Nodes=np.genfromtxt(Path.cwd()/'backend'/"TimeHistory"/"Nodes.txt",invalid_raise=False)
+    Nodes=np.genfromtxt(current_path/"Nodes.txt",invalid_raise=False)
     # Member connections 
-    conect = np.loadtxt(Path.cwd()/'backend'/"TimeHistory"/"Connc.txt",delimiter=',')
+    conect = np.loadtxt(current_path/"Connc.txt",delimiter=',')
     # Frames asigns
-    idele=np.genfromtxt(Path.cwd()/'backend'/"TimeHistory"/"Elementid.txt",invalid_raise=False)
+    idele=np.genfromtxt(current_path/"Elementid.txt",invalid_raise=False)
     # Members Properties
-    Members=np.genfromtxt(Path.cwd()/'backend'/"TimeHistory"/"Members.txt",invalid_raise=False)
+    Members=np.genfromtxt(current_path/"Members.txt",invalid_raise=False)
     # Names
-    Names = np.genfromtxt(Path.cwd()/'backend'/"TimeHistory"/"Nmes.txt",dtype='str',delimiter = '')
+    Names = np.genfromtxt(current_path/"Nmes.txt",dtype='str',delimiter = '')
     return Nodes, conect, idele,Members,Names
 #---------------------------- 12.Topology ------------------------------------#
 def zero_length(Ni,Nic,EO,Ei):

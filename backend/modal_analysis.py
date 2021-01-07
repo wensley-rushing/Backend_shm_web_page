@@ -48,5 +48,5 @@ def model_analysis(accelerations_df, interval_i,engine):
             'dampopt' : dampopt.tolist(),
             'phi' : phi_matrix.tolist()
         })
-        #df.to_sql("modal_analysis_results", engine, if_exists='append', index=None)
+        df.to_sql("modal_analysis_results", engine, if_exists='append', index=None)
         return df

@@ -7,8 +7,9 @@ import numpy as np
 import pandas as pd
 import rainflow
 
+current_path = Path(str(__file__)).parent
 
-path_timehistory = Path.cwd()/"backend"/"data_generated"/"timehistoryfiles"/"results"
+path_timehistory = current_path/"data_generated"/"timehistoryfiles"/"results"
 
 
 m = 3.202; #material const of the Paris law
