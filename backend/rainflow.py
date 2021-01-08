@@ -56,6 +56,7 @@ def crack_size(file):
 def store_results_in_db(engine):
     
     files = [f for f in os.listdir(path_timehistory) if not f.startswith('.')]
+    og_files = files
     results_array = np.zeros((len(files),number_analyzed_components*2))
     
     for i,file in enumerate(files):
@@ -74,3 +75,9 @@ def store_results_in_db(engine):
     df = pd.DataFrame(results_array, columns = columns)
     df['timestamp'] = files_datetime
     df.to_sql("stress_events_rainflow", engine, if_exists='append', index=None)
+    remove_files(og_files)
+
+def remove_files(files):
+    for file in files:
+        path_to_file = path_timehistory/file
+        os.remove(path_to_file)

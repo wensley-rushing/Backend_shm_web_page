@@ -1,8 +1,11 @@
-import numpy as np
-import openseespy.opensees as ops
 from pathlib import Path
 
+import numpy as np
+import openseespy.opensees as ops
+
+
 current_path = Path(str(__file__)).parent
+
 #---------------------------- 1. Topology  -----------------------------------#
 def Topology():
     # Get the Nodes coordinate
@@ -95,7 +98,7 @@ def Hailcreek(Members,Nodes,conect,idele, E,Mb,Ld,N,Names,flag,NNI,WW,Ei):
         
     # Nodes whit supports
     for i in range(len(Supp)):
-        ops.fix(int(Supp[i]),1,1,1,0,0,0)
+     ops.fix(int(Supp[i]),1,1,1,0,0,0)
     
     for i in range(len(masa)):
         ops.mass(masa[i, 0], masa[i, 1], masa[i, 1], masa[i, 1], 0, 0, 0)
@@ -251,7 +254,7 @@ def load_cases(ld,conect,idele,Members,gama):
         ops.timeSeries('Linear',1)
         ops.pattern("Plain", 1, 1)
         Ew= {}
-        loads = np.loadtxt('Loads_wx.txt')
+        loads = np.loadtxt(current_path/'Loads_wx.txt')
         xo = [1,0,0]
         # Y = [1,0,0]
         # Z = [0,1,0]
@@ -265,7 +268,7 @@ def load_cases(ld,conect,idele,Members,gama):
                     ops.eleLoad('-ele',tag,'-type','-beamUniform', wi,0,0)
                     Ew[tag] = {tag: ['-beamUniform',wi,0,0]}
             else:
-                    print(tag)
+                    # print(tag)
                     tag = loads[i,0]
                     ter = np.sum(xo)/np.sum(zi)
                     wi = loads[i,1]*ter
@@ -326,7 +329,7 @@ def load_cases(ld,conect,idele,Members,gama):
         ops.timeSeries('Linear',1)
         ops.pattern("Plain", 1, 1)
         Ew= {}
-        loads = np.loadtxt('Loads_wy.txt')
+        loads = np.loadtxt(current_path/'Loads_wy.txt')
         xo = [0,1,0]
         # Y = [1,0,0]
         # Z = [0,1,0]
@@ -404,7 +407,61 @@ def load_cases(ld,conect,idele,Members,gama):
         Ew= {}
         return Ew
 #---------------------------- 9. Desing Stress Forces ------------------------#
-
+def Desing_Stress_Forces(ld,conect,idele,Ew):
+    Ful_Sec = np.loadtxt(current_path/'Members_full.txt')
+    if ld<2:
+        for i in range(len(conect[:,1])):
+            #(N, Vy, Vz, T, My, Mz)
+            tag = i+1
+            s,Mz =Forces(tag,Ew[tag])
+    
+            print('Element id:',tag,'max Vy: ',max(s[:,1]))
+            print('Element id:',tag,'min Vy: ',min(s[:,1]))
+            print('Element id:',tag,'max P: ',max(s[:,0]))
+            print('Element id:',tag,'min P: ',min(s[:,0]))
+            
+            if tag == 2:
+                np.savetxt(current_path/'2.txt',s,delimiter = '  ')
+    else:       
+          if ld >= 5:
+              return 
+          else:
+              if ld == 3:
+                  Loads = np.loadtxt(current_path/'Loads_wx.txt')   
+              else:
+                 Loads = np.loadtxt(current_path/'Loads_wy.txt') 
+                      
+              for i in range(len(Loads[:,1])):
+                #(N, Vy, Vz, T, My, Mz)
+                tag = Loads[i,0]
+                s,Mz =Forces(tag,Ew[tag])
+                Zy = Ful_Sec[int(idele[int(tag-1)]-1),15]
+                Zx = Ful_Sec[int(idele[int(tag-1)]-1),16]
+                AA = Ful_Sec[int(idele[int(tag-1)]-1),6]
+                Asy = Ful_Sec[int(idele[int(tag-1)]-1),12]
+                Asx = Ful_Sec[int(idele[int(tag-1)]-1),11]
+                print( 'Zy',' Section: ' , tag ,': ',Zy)
+                print( 'Zx',' Section: ' , tag ,': ',Zx)
+                print('Elemento id:',tag,'max Mz: ',max(Mz)/1000000)
+                print('Elemento id:',tag,'min Mz: ',min(Mz)/1000000)
+                print('Element id:',tag,'max My: ',max(s[:,4])/1000000)
+                print('Element id:',tag,'min My: ',min(s[:,4])/1000000)
+                print('****** Stress *******')
+                print('Element id:',tag,'max Sigma My + : ',max(s[:,5])/Zy)
+                print('Element id:',tag,'min Sigma My - : ',min(s[:,5])/Zy)
+                print('Element id:',tag,'max Sigma My + : ',max(s[:,4])/Zx)
+                print('Element id:',tag,'min Sigma My - : ',min(s[:,4])/Zx)
+                print('Element id:',tag,'Normal Stress  : ',max(s[:,0])/AA)
+                print('Element id:',tag,'Tau y +  : ',max(s[:,2])/Asy)
+                print('Element id:',tag,'Tau y -  : ',min(s[:,2])/Asy)
+                print('Element id:',tag,'Tau x +  : ',max(s[:,1])/Asx)
+                print('Element id:',tag,'Tau x -  : ',min(s[:,1])/Asx)
+                
+                print('****** Forces *******')
+                
+                if tag == 496:
+                    np.savetxt(current_path/'496.txt',s,delimiter = '  ')               
+#---------------------------- 10. Forces -------------------------------------#
 def Forces(ele_tag,Ew):
     
     """
@@ -607,15 +664,19 @@ def winds_loads(Ew,loads,xo,Lfac):
                     Ew[int(tag)][int(tag)][2] =+ wi*Lfac
                     # Ew[tag] = {tag: ['-beamUniform',wi,0,0]}
             else:
+                    # breakpoint()
+                    # print(tag)
+             
                     ter = np.sum(xo)/np.sum(zi)
                     wi = loads[i,1]*ter
+                    # print('¨*_****',wi,'****')
                     # ops.eleLoad('-ele',tag,'-type','-beamUniform', 0,wi,0)
                     # Ew[tag] = {tag: ['-beamUniform',0, wi,0]}
                     Ew[int(tag)][int(tag)][2] =+ wi*Lfac
         return Ew    
     
 def assignloads_dist(Ew):
-    for i in range(len(Ew)): 
+    for i in range(len(Ew)):
         wi,wj,wk = Ew[int(i+1)][int(i+1)][1:]
         ops.eleLoad('-ele',int(i+1),'-type','-beamUniform', wi,wj,wk)
 
@@ -632,7 +693,27 @@ def assign_poinloads(Ldfactor,Ploads):
         Pz =  Ploads[i,3]*Ldfactor
         LOADS = [Px,Py,Pz,0,0,0]
         ops.load(tag,*LOADS)
+
+def assign_point_seismic(Lfactor):
+    Sl = np.loadtxt(current_path/'Seismic_Load_Hk.txt')
+    for i in range(Sl.shape[0]-1):
+        Px = Sl[i,0]*Lfactor[0]*1000
+        Py = Sl[i,1]*Lfactor[1]*1000
+        Pz = Sl[i,2]*Lfactor[2]*1000
+        LOADS = [Px,Py,Pz,0,0,0]
+        tag = int(i+1)
+        ops.load(tag,*LOADS)
+        
+def assign_point_truck(Lfactor):
+    Sl = np.loadtxt(current_path/'Truckload.txt')
     
+    for i in range(Sl.shape[0]-1):
+        Px = Sl[i,0]*Lfactor
+        Py = Sl[i,1]*Lfactor
+        Pz = Sl[i,2]*Lfactor
+        LOADS = [Px,Py,Pz,0,0,0]
+        tag = int(i+1)
+        ops.load(tag,*LOADS)    
 
                             
 
@@ -693,14 +774,16 @@ def Desing_Stress_Forces2(ld,conect,idele,Ew,Names):
             dratio  = max(abs(N))/ (Cpcity[int(idele[i]-1),1]*1000)
         else:
             dt_N = max(abs(N))/ (Cpcity[int(idele[i]-1),1]*1000)
-            dt_Mz = max(abs(Mz)/1000000)/ Cpcity[int(idele[i]-1),2]
-            dt_My = max(abs(My)/1000000)/ Cpcity[int(idele[i]-1),3]
+            dt_Mz = max(abs(Mz)*0.0000010)/ Cpcity[int(idele[i]-1),2]
+            dt_My = max(abs(My)*0.0000010)/ Cpcity[int(idele[i]-1),3]
             Alldratio = [dt_N,dt_Mz,dt_My]
             dratio = max(np.abs(Alldratio))
         
         sig_N =sigMz_p+sigMz_n+sigMy_p+sigMy_n + SgN_p+SgN_n
         tau_T = tauz_p+tauz_n+tauy_p+ tauy_n
         sig_Vommises = (sig_N**2+3*tau_T**2)**0.5
+        # print('Element id ',tag,' ',Names[int(idele[i]-1)],' Vonnmisses: ',round(sig_Vommises,3),'Desing ratio',dratio)
+        # breakpoint()
         Svonmisses[tag] = [sig_Vommises, dratio,dt_N,dt_Mz,dt_My]
         Design_ratio[tag] = dratio
     return Svonmisses,Design_ratio
@@ -714,3 +797,50 @@ def run_model():
     ops.analysis('Static')
     ops.analyze(1)
     
+def Realiability(Dr):
+    # breakpoint()
+    pf = np.zeros((Dr.shape[0],1))
+    for i in range(Dr.shape[0]):
+        beta = 5.86*Dr[i]**2-15.83*Dr[i]+9.97
+        # breakpoint()
+        pf[i,0] = prob(beta)
+    return pf
+        
+def prob(beta):
+    
+    if 0 < beta < 1.3:	
+        prob = -0.690*beta+1.000
+    if 1.3 <= beta < 2.3:	
+        prob = -0.09*beta+0.217
+    if 2.3 <= beta < 3.1:	
+        prob = -0.010*beta+0.035
+    if 3.1 <= beta < 3.7:	
+        prob = -0.0015*beta+0.0057
+    if 3.7 <= beta < 4.2:	
+        prob = 10**-5
+    if 4.2 <= beta < 4.7:	
+        prob = 10**-6
+    if 4.7 <= beta:	
+        beta = 4.7
+        prob = 10**-7
+
+    return prob
+
+def Likelyhoood(prob,cases):
+    if cases ==1:
+        P = 1/50
+        Lk = prob*P
+        return Lk
+    if cases ==2:
+        P = 1
+        Lk = prob*P
+        return Lk
+    if cases ==3:
+        P = 1/500
+        Lk = prob*P
+        return Lk
+    if cases ==4:
+        P = 1/5
+        Lk = prob*P
+        return Lk
+        

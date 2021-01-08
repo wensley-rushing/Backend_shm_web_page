@@ -34,9 +34,15 @@ gama,g=78.5*10**-6,9800.
 E,G = 200*10**3,0.25*10**3
 
 
+last_date_query = "SELECT * FROM modal_analysis_results ORDER BY date1 DESC LIMIT 1"
+
 #------------------------------ 7. Data base results -------------------------#
-def get_model_analysis_data(df_model_analysis,Q1):
-    df_model_analysis_date = df_model_analysis[df_model_analysis['date1'] == Q1].copy()
+def get_model_analysis_data(engine):
+    last_date = pd.read_sql(last_date_query, engine).date1[0]
+    
+    last_hour_query = f"SELECT * FROM modal_analysis_results WHERE date1 = '{last_date}'"
+    df_model_analysis_date = pd.read_sql(last_hour_query, engine)
+    
     df_model_analysis_date.sort_values(by=['fre'], ascending=False,inplace = True)
     data_numpy = df_model_analysis_date.to_numpy()
     fre = data_numpy[:,2]
@@ -59,7 +65,7 @@ def opti(Freq,phi):
     
     Mbo = Mo
     
-    Freq = [Freq[0]/30,Freq[0]/30]
+    Freq = Freq[:Nm]/30
     phi = phi[:,:Nm]
     
     MB1 = 5

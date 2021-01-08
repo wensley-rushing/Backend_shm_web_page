@@ -15,8 +15,7 @@ using_channels = 5
 
 
 def get_event_data(accelerations_df, interval):
-    data_event = accelerations_df[
-        (accelerations_df['sampledatetime'] >= interval[0]) & (accelerations_df['sampledatetime'] <= interval[1])].copy()
+    data_event = accelerations_df[(accelerations_df['sampledatetime'] >= interval[0]) & (accelerations_df['sampledatetime'] <= interval[1])].copy()
     data_event.drop(columns = ['sampledatetime'], inplace = True)
     return data_event
 

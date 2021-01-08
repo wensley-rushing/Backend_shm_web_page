@@ -15,8 +15,9 @@ C_COV = 0.2;    #covariance of C material variable
 C_mu = math.log(C_m**2/(math.sqrt((C_m*C_COV)**2+C_m**2)));  #mean of logarithmic values C material variable
 C_sigma = math.sqrt(math.log((((C_m*C_COV)**2)/C_m**2)+1));  #standard deviation of logarithmic values C material variable
 
-date_yesterday_start = (datetime.now() - timedelta(days = 1)).strftime('%Y-%m-%d 00:00:00')
-date_yesterday_end = (datetime.now() - timedelta(days = 1)).strftime('%Y-%m-%d 23:59:59')
+australian_time = datetime.now() + timedelta(hours = 10)
+date_yesterday_start = (australian_time - timedelta(days = 1)).strftime('%Y-%m-%d 00:00:00')
+date_yesterday_end = (australian_time - timedelta(days = 1)).strftime('%Y-%m-%d 23:59:59')
 
 P_cracks = list()
 a_mu_cracks = list()
@@ -80,7 +81,7 @@ def montecarlo_simulation(engine):
                 'std_crack_size' : [a_sigma_cracks],
                 'pro': [P_cracks],
                 'cycles_sum':[cycles_sum.tolist()],
-                'monitored_day':date_yesterday_end.split()[0]
+                'monitored_day':australian_time.strftime('%Y-%m-%d 00:00:00').split()[0]
     })
     
     df.to_sql("crack_monitoring", engine, if_exists='append', index=None)
