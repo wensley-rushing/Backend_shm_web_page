@@ -15,11 +15,11 @@ likelihood_name = f'{australian_time.year}-{australian_time.month:02}-{(australi
 code_paths = Path('/home/ec2-user/code_comp_files')
 risk_mgmt_paths = Path('/home/ec2-user/risk_management_results')
 
-likelihood = np.loadtxt(code_paths/likelihood_name)
 
 severity_values = np.array([2,2,2,2,3,3,3,0])
 
 def calculate_risk():
+    likelihood = np.loadtxt(code_paths/likelihood_name)
     last_data_query = "SELECT pro,monitored_day FROM crack_monitoring ORDER BY monitored_day DESC LIMIT 1"
     last_monitored_crack = pd.read_sql(last_data_query, engine).to_numpy()
     

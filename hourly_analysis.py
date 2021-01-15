@@ -1,3 +1,21 @@
+'''
+This code executes the codes that need to be done each hour. The codes are:
+    - db_con.connection_and_data_retrieving:
+        Returns de engine to connect to the Postgres DB and a DataFrame object
+        of the given dates Q1-Q2.
+    - event_detect.get_events:
+        Returns a tuple that has in the first position an array of the picks found
+        and in the second an array of the times in which each event took place in 
+        the given time Q1-Q2.
+    - modal_anl.model_analysis:
+        Returns the results of the opetarions made between each event that was
+        detected in the function get_events.
+    - time_hst.Time_history:
+        Returns the results of the operations made in txt files 
+    - rainflow.store_results_in_db:
+        Executes the rainflow operations in each file that was created in the 
+        Time_history function and saves the results in the DB.
+'''
 import os
 from datetime import datetime, timedelta
 from pathlib import Path

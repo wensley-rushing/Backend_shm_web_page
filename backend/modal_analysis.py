@@ -15,11 +15,44 @@ using_channels = 5
 
 
 def get_event_data(accelerations_df, interval):
+    '''
+    Get the acceleration data that is within the interval.
+    
+    Parameters
+    ----------
+    accelerations_df: DataFrame object
+        DataFrame containing the accelerations of a given hour.
+    interval: list 
+        A list of two elements containing the start and end of the time 
+        between events.
+    
+    Returns
+    -------
+    data_event: DataFrame object
+        DataFrame with the accelerations that are within the interval.
+    '''
     data_event = accelerations_df[(accelerations_df['sampledatetime'] >= interval[0]) & (accelerations_df['sampledatetime'] <= interval[1])].copy()
     data_event.drop(columns = ['sampledatetime'], inplace = True)
     return data_event
 
 def model_analysis(accelerations_df, interval_i,engine):
+    '''
+    Computers the model analysis algorithms and stores the results in the database
+    
+    Parameters
+    ----------
+    accelerations_df: DataFrame object
+        DataFrame containing the accelerations of a given hour.
+    interval_i_: list
+        A list of two elemnts containing the start and end of the time
+        between events.
+    
+    Returns
+    -------
+    df: DataFrame object
+        DataFrame object with the results of the model analysis in that
+        specific event interval.
+    '''
     Event_data = get_event_data(accelerations_df, interval_i)
     
     Event_data_numpy = Event_data.to_numpy()

@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 
+## Global constants for the algorithm of crack detection
 m = 3.202; #material const of the Paris law
 number_of_runs = 2; #number of runs for Monte Carlo Simulation
 a_c = [0.35,0.00318,0.00318,0.00318,0.00318,0.00318,0.00318,0.00318];     #rack critical size
@@ -15,6 +16,7 @@ C_COV = 0.2;    #covariance of C material variable
 C_mu = math.log(C_m**2/(math.sqrt((C_m*C_COV)**2+C_m**2)));  #mean of logarithmic values C material variable
 C_sigma = math.sqrt(math.log((((C_m*C_COV)**2)/C_m**2)+1));  #standard deviation of logarithmic values C material variable
 
+## Getting the correct date for australia
 australian_time = datetime.now() + timedelta(hours = 10)
 date_yesterday_start = (australian_time - timedelta(days = 1)).strftime('%Y-%m-%d 00:00:00')
 date_yesterday_end = (australian_time - timedelta(days = 1)).strftime('%Y-%m-%d 23:59:59')
@@ -24,6 +26,26 @@ a_mu_cracks = list()
 a_sigma_cracks = list()
 
 def load_data(engine):
+    '''
+    Gets all the data from the table stress events rainflow that
+    is stored in the database from yesterday.
+    
+    Parameters
+    ----------
+    engine: sqlalchemy object
+        engine that connects to the database.
+    
+    Returns
+    -------
+    cycles_sum: numpy array
+        array with the sum of each column of the cycles.
+    equivalent_range_mean: numpy array
+        array with the mean of each column of the equivalent ranges.
+    equivalent_range_std: numpy array
+        array with the standar deviation of each colum of the equivalent ranges.
+    crack_yesterday: numpy array
+        array with the crack information from yesterday.
+    '''
     rainflow_data = pd.read_sql(f'''
                             SELECT * 
                             FROM stress_events_rainflow 
@@ -48,7 +70,18 @@ def load_data(engine):
     return cycles_sum,equivalent_range_mean,equivalent_range_std,crack_yesterday
 
 def montecarlo_simulation(engine):
+    '''
+    Stores a montecarlos simulation given the crack information in the database
     
+    Parameters
+    ----------
+    engine: sqlachemy object
+        engine that connects to the database.
+    
+    Returns
+    -------
+    None
+    '''
     cycles_sum,equivalent_range_mean,equivalent_range_std,crack_yesterday = load_data(engine)
     
     for j in range(len(crack_yesterday[0][0])):

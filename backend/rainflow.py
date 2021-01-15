@@ -22,6 +22,20 @@ columns = ['cycles_b1','equivalent_range_b1','cycles_b1_5','equivalent_range_b1_
           'cycles_d5','equivalent_range_d5','cycles_d1_c1','equivalent_range_d1_c1']
 
 def crack_size(file):
+    '''
+    Load a file created by the time history module and executes the 
+    rainflow algorithm and stores the results in an array.
+    
+    Parameters
+    ----------
+    file: txt file
+        file of specific event created by the time history module.
+    
+    Results
+    -------
+    results_data: numpy array
+        array with the results of the rainflow algorithm.
+    '''
     stress_time_event = np.loadtxt(path_timehistory/file)
     stress_time_event_data = stress_time_event[:,:number_analyzed_components] # this most be specified at some point
     N_results = np.zeros(number_analyzed_components)
@@ -54,7 +68,19 @@ def crack_size(file):
     return results_data
 
 def store_results_in_db(engine):
+    '''
+    Saves the results of the crack_size functions in the database
+    and then removes the files created by time history module.
     
+    Parameters
+    ----------
+    engine: sqlachemy object
+        engine that connects to the database.
+    
+    Returns
+    -------
+    None.
+    '''
     files = [f for f in os.listdir(path_timehistory) if not f.startswith('.')]
     og_files = files
     results_array = np.zeros((len(files),number_analyzed_components*2))
@@ -78,6 +104,19 @@ def store_results_in_db(engine):
     remove_files(og_files)
 
 def remove_files(files):
+    '''
+    Removes the files created in the time history module because
+    they are not longer needed.
+    
+    Parameters
+    ----------
+    files: list of files
+        files created in the time history module.
+        
+    Returns
+    -------
+    None.
+    '''
     for file in files:
         path_to_file = path_timehistory/file
         os.remove(path_to_file)

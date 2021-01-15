@@ -60,6 +60,18 @@ combo = [[1.25,0,1,0,0,0,0],
 results = {}
 
 def compute_opensees():
+    '''
+    Computes operations with the opensees library
+    
+    Parameters
+    ----------
+    None.
+    
+    Returns
+    -------
+    results: numpy array
+        array contaning the results of the operations obtained with the opensees library.
+    '''
     Nodes, conect, idele,Members,Names = FHK.Topology()
     for i in range(len(combo)):
 
@@ -101,6 +113,17 @@ def max_values():
     return Results,lk
         
 def create_files():
+    '''
+    Creates the txt files contaning the final results of the design ratio algorithm
+    
+    Parameters
+    ----------
+    None.
+    
+    Returns
+    -------
+    None.
+    '''
     Results,lk = max_values()
     
     australian_time = datetime.now() + timedelta(hours = 10)

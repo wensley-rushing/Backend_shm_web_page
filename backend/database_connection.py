@@ -35,6 +35,18 @@ def preprocess(df,columns):
     return _df
 
 def create_connection():
+    """
+    Creates the engine to connect to the Postgres DB
+    
+    Parameters
+    ----------
+    None
+        
+    Returns
+    -------
+    engine: sqlalchemy object
+        Returns the engine to connect to the database.
+    """
     engine = None
     
     host = credentials['host']
@@ -52,7 +64,21 @@ def create_connection():
     return engine
 
 def connection_and_data_retrieving(Q1,Q2):
-
+    """
+    Stablish a connection with the database and returns the data
+    between Q1 and Q2.
+    
+    Parameters
+    ----------
+    Q1, Q2: datetime 
+    
+    Returns
+    -------
+    accelerations_df: DataFrame
+        Returns the DataFrame with the data between Q1 and Q2
+    create_connection: Function
+        Returns the engine that connects to the Postgres DB.
+    """
     con = None
     try:
         con = psycopg2.connect(

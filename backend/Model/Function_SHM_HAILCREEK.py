@@ -528,12 +528,13 @@ def create_pickles(Nodes,conect,path,name):
     f.close()
 
 def Drawing2database(Nm):
+    ## Ask Alejandro why is always returnig the same
     FS = 50000
     Nodes, conect, idele,Members,Names = Topology()
     path = current_path/".."/".."/".."/"pickle_visualization"
     for i in range(Nm):
-        idd  = str(Nm+1)
-        Modes =getmodeshapes(Nodes,Nm)
+        idd  = str(i+1)
+        Modes = getmodeshapes(Nodes,i+1)
         Nodes2 = Nodes+Modes*FS
         create_pickles(Nodes2,conect,path,f"Mode{idd}")
         name = f"Mode{idd}.txt"
