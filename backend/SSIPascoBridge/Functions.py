@@ -10,7 +10,7 @@ from scipy import signal
 #-- Opensees --#
 
 import numpy as np
-import openseespy.opensees as ops
+import opensees.openseespy as ops
 import warnings
 import openseespy.postprocessing.ops_vis as opsv
 

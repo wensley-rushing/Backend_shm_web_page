@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import openseespy.opensees as ops
+import opensees.openseespy as ops
 import openseespy.postprocessing.ops_vis as opsv
 import backend.Model.BSDTA as BS
 from scipy import stats

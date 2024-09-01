@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import numpy as np
-import openseespy.opensees as ops
+import opensees.openseespy as ops
 
 
 current_path = Path(str(__file__)).parent
